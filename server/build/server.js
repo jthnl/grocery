@@ -12,48 +12,38 @@ const db_1 = __importDefault(require("./database/db"));
 const joi_1 = require("./model/joi");
 const uuid_1 = require("uuid");
 const routes_1 = __importDefault(require("./routes")); // Update the path to match your directory structure
+const cors_1 = __importDefault(require("cors")); // Import the cors middleware
 const app = (0, express_1.default)();
 const port = 3001;
+// Use the cors middleware with proper configuration
+app.use((0, cors_1.default)({
+    origin: 'http://localhost:3000',
+    credentials: true, // Allow credentials (cookies, etc.)
+}));
 // middlewares
 app.use(express_1.default.json());
 app.use((0, express_session_1.default)({ secret: 'your-secret-key', resave: false, saveUninitialized: false }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
-// Passport configuration
-passport_1.default.use(new passport_local_1.Strategy((username, password, done) => {
-    // Fetch the user from the database using email
-    (0, db_1.default)('User')
-        .where('email', username)
-        .first()
-        .then((user) => {
+passport_1.default.use(new passport_local_1.Strategy(async (username, password, done) => {
+    try {
+        const user = await (0, db_1.default)('User').where('email', username).first();
         if (!user) {
             return done(null, false, { message: 'User not found.' });
         }
-        // Fetch the corresponding user authentication data
-        (0, db_1.default)('UserAuth')
-            .where('userId', user.userId)
-            .first()
-            .then((userAuth) => {
-            if (!userAuth) {
-                return done(null, false, { message: 'User authentication data not found.' });
-            }
-            bcrypt_1.default.compare(password, userAuth.passwordHash, (err, result) => {
-                if (err) {
-                    return done(err);
-                }
-                if (!result) {
-                    return done(null, false, { message: 'Incorrect password.' });
-                }
-                return done(null, user);
-            });
-        })
-            .catch((error) => {
-            done(error);
-        });
-    })
-        .catch((error) => {
-        done(error);
-    });
+        const userAuth = await (0, db_1.default)('UserAuth').where('userId', user.userId).first();
+        if (!userAuth) {
+            return done(null, false, { message: 'User authentication data not found.' });
+        }
+        const result = await bcrypt_1.default.compare(password, userAuth.passwordHash);
+        if (!result) {
+            return done(null, false, { message: 'Incorrect password.' });
+        }
+        return done(null, user);
+    }
+    catch (error) {
+        return done(error);
+    }
 }));
 passport_1.default.serializeUser((user, done) => {
     done(null, user.userId);
@@ -81,7 +71,8 @@ app.get('/logout', (req, res) => {
 });
 app.get('/profile', (req, res) => {
     if (req.isAuthenticated()) {
-        res.json({ user: req.user });
+        const authenticatedUserId = req.user.userId; // Authenticated user's userId
+        res.json({ userId: authenticatedUserId }); // Return the authenticated user's ID
     }
     else {
         res.status(401).json({ message: 'Unauthorized.' });
