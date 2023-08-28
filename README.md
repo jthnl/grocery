@@ -49,10 +49,8 @@ REACT_APP_BASE_URL=http://localhost:3001
 ![website login](https://github.com/jthnl/grocery/blob/main/images/reorder_items.png)
 1. arrows show old versions of the list:
 ![website login](https://github.com/jthnl/grocery/blob/main/images/add_items.png)
-1. delete items off the list (x):
-![website login](https://github.com/jthnl/grocery/blob/main/images/add_items.png)
-1. check items on the list (arrows) or delete items off the list (x):
-![website login](https://github.com/jthnl/grocery/blob/main/images/main.png)
+1. delete items off the list (x), check items on the list (checkbox) or create new lists:
+![website login](https://github.com/jthnl/grocery/blob/main/images/final.png)
 
 
 
