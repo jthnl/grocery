@@ -12,7 +12,7 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/signup" element={<Signup />} />
-        {/* Use the ProtectedRoute component for Dashboard */}
+        {/* Protected Routes to check Authentication */}
         <Route
           path="/"
           element={<ProtectedRoute user={user} component={Dashboard} />}
@@ -22,6 +22,8 @@ const App = () => {
   );
 };
 
+// TODO: Change to a more reliable check for User Session
+// Protected Routes redirect to login if user is not authenitcated.
 interface ProtectedRouteProps {
   user: string | null;
   component: React.ComponentType<any>;
@@ -34,7 +36,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   if (!user) {
     return <Navigate to="/login" />;
   }
-
   return <Component />;
 };
 

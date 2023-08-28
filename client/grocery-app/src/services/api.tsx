@@ -1,8 +1,9 @@
 import axios from "axios";
 import { GroceryList, Entry, RegistrationData } from "../model/models";
 
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
+// User Authentication API Calls
 export const authApi = {
   login: async (username: string, password: string): Promise<void> => {
     try {
@@ -50,6 +51,7 @@ export const authApi = {
   }
 };
 
+// Program (Dashboard) API Calls
 export const api = {
   getListEntries: async (): Promise<Entry[]> => {
     try {

@@ -1,7 +1,8 @@
+// Login Page 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
-import './Form.css'; // Import the CSS file for styling
+import '../styles/Form.css'; 
 
 interface LoginProps {
   setUser: (user: string | null) => void;

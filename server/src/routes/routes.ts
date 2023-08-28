@@ -59,8 +59,6 @@ router.post("/getEntryHistory", async (req, res) => {
 // add a new version entry and update the list
 router.post("/updateList", async (req, res) => {
   const { oldEntry, newData } = req.body;
-  console.log(oldEntry);
-  console.log(newData);
   try {
     const result = await db.updateList(oldEntry, newData);
     if (result.success) {

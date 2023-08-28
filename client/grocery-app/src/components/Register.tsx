@@ -1,7 +1,8 @@
+// Register Page - New User Registration
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
-import './Form.css'; // Import the CSS file for styling
+import '../styles/Form.css';
 
 function Register() {
   const navigate = useNavigate();
@@ -13,11 +14,11 @@ function Register() {
   const [error, setError] = useState('');
 
   const handleSignup = async () => {
+    // TODO: Add error handling validation checks and messages in the server.
     if (password !== rePassword) {
       setError('Passwords do not match.');
       return;
     }
-
     try {
       await authApi.register({
         firstName: firstName,

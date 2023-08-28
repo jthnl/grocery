@@ -1,10 +1,12 @@
+// Modal - Edit Entries
+// TODO: Modularize and Organize Modal Code.
 import React, { useState, useEffect } from "react";
 import { Entry, ListItem, GroceryList } from "../model/models";
 import { DragDropContext, Draggable } from "react-beautiful-dnd";
 import { StrictModeDroppable } from "./Droppable";
 import { api } from "../services/api";
 
-import "./Modal.css";
+import "../styles/Modal.css";
 
 interface ModalProps {
   entry: Entry;
@@ -16,18 +18,13 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
   const selectedGroceryList: GroceryList = entry.data as GroceryList;
 
-  const [editedTitle, setEditedTitle] = useState(
-    selectedGroceryList.title || ""
-  );
-  const [editedItems, setEditedItems] = useState<ListItem[]>(
-    selectedGroceryList.items || []
-  );
+  const [editedTitle, setEditedTitle] = useState(selectedGroceryList.title || "");
+  const [editedItems, setEditedItems] = useState<ListItem[]>(selectedGroceryList.items || []);
   const [newItemTitle, setNewItemTitle] = useState("");
-
   const [entryHistory, setEntryHistory] = useState<Entry[]>([]);
   const [currentVersionIndex, setCurrentVersionIndex] = useState<number>(0);
 
-
+  // listeners
   useEffect(() => {
     fetchEntryHistory(entry.listId);
   }, [entry.listId]);
@@ -40,29 +37,28 @@ const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
     }
   }, [entryHistory, currentVersionIndex]);
 
+  // api calls
+  const fetchEntryHistory = async (listId: string) => {
+    try {
+      const history = await api.getEntryHistory(listId);
+      setEntryHistory(history);
+    } catch (error) {
+      console.error("Error fetching entry history:", error);
+    }
+  };
 
-    // Fetch entry history from the server
-    const fetchEntryHistory = async (listId: string) => {
-        try {
-          const history = await api.getEntryHistory(listId);
-          setEntryHistory(history);
-        } catch (error) {
-          console.error("Error fetching entry history:", error);
-        }
-      };
-    
+  // handlers
+  const handlePreviousVersion = () => {
+    if (currentVersionIndex > 0) {
+      setCurrentVersionIndex(currentVersionIndex - 1);
+    }
+  };
 
-      const handlePreviousVersion = () => {
-        if (currentVersionIndex > 0) {
-          setCurrentVersionIndex(currentVersionIndex - 1);
-        }
-      };
-    
-      const handleNextVersion = () => {
-        if (currentVersionIndex < entryHistory.length - 1) {
-          setCurrentVersionIndex(currentVersionIndex + 1);
-        }
-      };
+  const handleNextVersion = () => {
+    if (currentVersionIndex < entryHistory.length - 1) {
+      setCurrentVersionIndex(currentVersionIndex + 1);
+    }
+  };
 
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEditedTitle(event.target.value);
@@ -82,17 +78,6 @@ const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
     updatedItems[index].metadata.checkbox =
       !updatedItems[index].metadata.checkbox;
     setEditedItems(updatedItems);
-  };
-
-  const handleAddNewItem = () => {
-    if (newItemTitle.trim() !== "") {
-      const newItem: ListItem = {
-        title: newItemTitle,
-        metadata: { checkbox: false },
-      };
-      setEditedItems([...editedItems, newItem]);
-      setNewItemTitle("");
-    }
   };
 
   const handleNewItemTitleChange = (
@@ -115,7 +100,7 @@ const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
 
   const handleSaveChanges = () => {
     const updatedItems = [...editedItems];
-  
+
     if (newItemTitle.trim() !== "") {
       const newItem: ListItem = {
         title: newItemTitle,
@@ -123,7 +108,7 @@ const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
       };
       updatedItems.push(newItem);
     }
-  
+
     const updatedData: Entry = {
       ...entry,
       data: {
@@ -131,7 +116,7 @@ const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
         items: updatedItems,
       },
     };
-  
+
     onSave(updatedData);
     onClose();
   };
@@ -156,11 +141,10 @@ const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
     setEditedItems(updatedItems);
   };
 
-  
-
   return (
     <div className="modal-overlay">
       <div className="modal-card">
+        {/* HEADER */}
         <button className="modal-close" onClick={onClose}>
           Close
         </button>
@@ -171,7 +155,10 @@ const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
           onChange={handleTitleChange}
           placeholder="Add Title"
         />
+
+        {/* BODY */}
         <div className="modal-items">
+            {/* DRAG-DROP ITEM LIST */}
           <DragDropContext onDragEnd={handleDragEnd}>
             <StrictModeDroppable droppableId="droppable">
               {(provided) => (
@@ -183,18 +170,9 @@ const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
                       index={index}
                     >
                       {(provided) => (
-                        <div
-                          className="draggable-item"
-                          {...provided.draggableProps}
-                          ref={provided.innerRef}
-                        >
+                        <div className="draggable-item" {...provided.draggableProps} ref={provided.innerRef}>
                           <div className="item-content">
-                            <div
-                              className="drag-handle"
-                              {...provided.dragHandleProps}
-                            >
-                              &#x2630;
-                            </div>
+                            <div className="drag-handle" {...provided.dragHandleProps}>&#x2630;</div>
                             <div className="item-details">
                               <input
                                 type="checkbox"
@@ -210,18 +188,14 @@ const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
                                   handleItemTitleChange(index, event)
                                 }
                               />
-                              <div
-                                className="delete-button"
-                                onClick={() => handleDeleteItem(index)}
-                              >
-                                &times;
-                              </div>
+                              <div className="delete-button" onClick={() => handleDeleteItem(index)}>&times;</div>
                             </div>
                           </div>
                         </div>
                       )}
                     </Draggable>
                   ))}
+                  {/* ADD NEW ITEM */}
                   {provided.placeholder}
                   <div className="item-content">
                     <div className="drag-handle">&#x2630;</div>
@@ -247,20 +221,13 @@ const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
             </StrictModeDroppable>
           </DragDropContext>
         </div>
+
+        {/* FOOTER */}
         <div className="modal-footer">
-        <button className="modal-button" onClick={handleNextVersion}>
-            &#8249;
-          </button>
-          <button className="modal-button" onClick={handlePreviousVersion}>
-            &#8250;
-          </button>
-          <button className="modal-delete" onClick={() => onDelete(entry.listId)}>
-            Delete
-          </button>
-          <div className="button-spacer" /> 
-          <button className="modal-save" onClick={handleSaveChanges}>
-            Save
-          </button>
+          <button className="modal-button" onClick={handleNextVersion}>&#8249;</button>
+          <button className="modal-button" onClick={handlePreviousVersion}>&#8250;</button>
+          <button className="modal-delete" onClick={() => onDelete(entry.listId)}>Delete</button>
+          <button className="modal-save" onClick={handleSaveChanges}>Save</button>
         </div>
       </div>
     </div>

@@ -1,14 +1,13 @@
+// Dashboard - main application page
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import ListCard from "./ListCard";
 import Modal from "./Modal";
 import SignOutButton from "./SignOutButton";
-
 import { Entry, GroceryList } from "../model/models";
 import { api } from "../services/api";
-
-import "./Dashboard.css";
+import "../styles/Dashboard.css";
 
 function Dashboard() {
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -20,8 +19,8 @@ function Dashboard() {
     fetchListEntries();
   }, []);
 
+  // external calls
   const fetchListEntries = async () => {
-    console.log("fetchListEntries");
     try {
       const data = await api.getListEntries();
       setEntries(data);
@@ -30,6 +29,7 @@ function Dashboard() {
     }
   };
 
+  // event handlers
   const handleEditClick = (entry: Entry) => {
     setSelectedEntry(entry);
     setModalVisible(true);
@@ -77,8 +77,8 @@ function Dashboard() {
       const success = await api.deleteList(listId);
       if (success) {
         fetchListEntries();
-        setSelectedEntry(null); // Clear the selected entry if it was deleted
-        setModalVisible(false); // Close the modal after deleting
+        setSelectedEntry(null);
+        setModalVisible(false);
       } else {
         console.error('Error deleting list');
       }

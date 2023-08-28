@@ -1,3 +1,8 @@
+/*
+ TODO: These types should be imported from server's types
+ so that changes are reflected throughout the program
+*/
+
 export interface RegistrationData {
   firstName: string;
   lastName: string;
