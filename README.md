@@ -3,8 +3,8 @@
 
 ## Feature Highlights
 - List Versioning - users can rollback to old versions of their lists
-- Scalability, modifications require minimal db access 
-- Multiple Lists support
+- Scalability - require minimal load on database and backend (can even be further optimized, sharding, minimizing access, etc) 
+- Multiple List support
 - Ability to create, delete, edit, and reorder items in the list
 
 ## Tech Stack
