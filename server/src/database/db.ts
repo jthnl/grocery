@@ -1,11 +1,12 @@
+// Database Routines
 import knex from 'knex';
 import { User, UserAuth, List, Entry } from '../model/models';
 import { validateGroceryList } from '../model/joi'
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 
+// configure knex to pgSQL
 dotenv.config();
-
 export const conn = knex({
   client: 'pg',
   connection: {
@@ -16,6 +17,7 @@ export const conn = knex({
   },
 });
 
+// User Authentication DB Calls
 export async function getUserById(userId: string): Promise<User | undefined> {
   return conn<User>('User').where('userId', userId).first();
 }
@@ -40,6 +42,7 @@ export async function registerNewUser(user: User, password: string): Promise<voi
   await conn<UserAuth>('UserAuth').insert(newUserAuth);
 }
 
+// Dashboard Program DB Calls
 export async function getLists(authenticatedUserId: string): Promise<List[]> {
   return conn('List').where('userId', authenticatedUserId).andWhere('active', true);
 }

@@ -3,6 +3,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcrypt';
 import * as db from '../database/db';
 
+// Choose passport local - session based strategy
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
@@ -10,17 +11,14 @@ passport.use(
       if (!user) {
         return done(null, false, { message: 'User not found.' });
       }
-
       const userAuth = await db.getUserAuthByUserId(user.userId);
       if (!userAuth) {
         return done(null, false, { message: 'User authentication data not found.' });
       }
-
       const result = await bcrypt.compare(password, userAuth.passwordHash);
       if (!result) {
         return done(null, false, { message: 'Incorrect password.' });
       }
-
       return done(null, user);
     } catch (error) {
       return done(error);
@@ -28,10 +26,12 @@ passport.use(
   })
 );
 
+// Passport - serialization from user to token
 passport.serializeUser((user: any, done: (err: any, id?: any) => void) => {
   done(null, user.userId);
 });
 
+// Passport - deserialization from token to user
 passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await db.getUserById(id);

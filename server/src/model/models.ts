@@ -1,3 +1,5 @@
+// TypeScript models
+
 export interface User {
   userId: string;
   firstName: string;

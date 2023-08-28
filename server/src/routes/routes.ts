@@ -1,23 +1,23 @@
+// Dashboard Application APIs
 import express from "express";
 import * as db from "../database/db";
 import { User } from "../model/models";
 const router = express.Router();
 
+// checks that all application routes are authenticated
 function ensureAuthenticated(req: any, res: any, next: any) {
   if (req.isAuthenticated()) {
     return next();
   }
   res.status(401).json({ message: "Unauthorized." });
 }
-
 router.use(ensureAuthenticated);
 
+// get all the latest entries for lists owned by user
 router.get("/getListEntries", async (req, res) => {
   const authenticatedUserId = (req.user as User).userId;
-
   try {
     const lists = await db.getLists(authenticatedUserId);
-
     const entries = await Promise.all(
       lists.map(async (list) => {
         const entry = await db.getLatestEntry(list);
@@ -32,6 +32,7 @@ router.get("/getListEntries", async (req, res) => {
   }
 });
 
+// get a specific entry
 router.post("/getEntry", async (req, res) => {
   const { entryId } = req.body;
   try {
@@ -43,6 +44,7 @@ router.post("/getEntry", async (req, res) => {
   }
 });
 
+// get a list of entries that represent the list's change history
 router.post("/getEntryHistory", async (req, res) => {
   const { listId } = req.body;
   try {
@@ -54,6 +56,7 @@ router.post("/getEntryHistory", async (req, res) => {
   }
 });
 
+// add a new version entry and update the list
 router.post("/updateList", async (req, res) => {
   const { oldEntry, newData } = req.body;
   console.log(oldEntry);
@@ -71,6 +74,7 @@ router.post("/updateList", async (req, res) => {
   }
 });
 
+// creates a new list with a new entry (version 1)
 router.post("/createNewList", async (req, res) => {
   const authenticatedUserId = (req.user as User).userId;
   try {
@@ -86,9 +90,9 @@ router.post("/createNewList", async (req, res) => {
   }
 });
 
+// set a list active field to false
 router.post("/deleteList", async (req, res) => {
-  const { listId } = req.body; 
-
+  const { listId } = req.body;
   try {
     const result = await db.deleteList(listId);
     if (result.success) {

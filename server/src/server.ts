@@ -21,6 +21,7 @@ app.use(session({ secret: sessionSecret, resave: false, saveUninitialized: false
 app.use(passport.initialize());
 app.use(passport.session());
 
+// routes
 app.use('/', authRoutes);
 app.use('/', routes);
 
