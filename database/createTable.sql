@@ -18,7 +18,7 @@ CREATE TABLE "UserAuth" (
 CREATE TABLE "List" (
   "listId" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   "userId" UUID REFERENCES "User" ("userId"),
-  "latestVersion" INTEGER, -- Reference the latest version's version number
+  "latestVersion" INTEGER,
   "active" BOOLEAN
 );
 
