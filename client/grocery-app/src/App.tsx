@@ -1,38 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Signup from './components/Register';
+import Dashboard from './components/Dashboard';
 
-function App() {
-  const [user, setUser] = useState({});
-  const [lists, setLists] = useState([]);
-
-  useEffect(() => {
-    // Fetch user based on email
-    fetch('/api/getUser/user@example.com')
-      .then(response => response.json())
-      .then(data => setUser(data));
-
-    // Fetch lists for a user
-    fetch('/api/getLists/user_id_here')
-      .then(response => response.json())
-      .then(data => setLists(data));
-  }, []);
+const App = () => {
+  const [user, setUser] = React.useState<string | null>(null);
 
   return (
-    <div className="App">
-      <h1>User Information</h1>
-      <p>User ID: {user.userId}</p>
-      <p>First Name: {user.firstName}</p>
-      <p>Last Name: {user.lastName}</p>
-      <p>Email: {user.email}</p>
-
-      <h1>User's Lists</h1>
-      <ul>
-        {lists.map(list => (
-          <li key={list.listId}>List ID: {list.listId}</li>
-        ))}
-      </ul>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login setUser={setUser} />} />
+        <Route path="/signup" element={<Signup />} />
+        {/* Use the ProtectedRoute component for Dashboard */}
+        <Route
+          path="/"
+          element={<ProtectedRoute user={user} component={Dashboard} />}
+        />
+      </Routes>
+    </BrowserRouter>
   );
+};
+
+interface ProtectedRouteProps {
+  user: string | null;
+  component: React.ComponentType<any>;
 }
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  user,
+  component: Component,
+}) => {
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  return <Component />;
+};
 
 export default App;
