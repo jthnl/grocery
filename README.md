@@ -2,10 +2,13 @@
 ![website image](https://github.com/jthnl/grocery/blob/main/images/main.png)
 
 ## Feature Highlights
-- Creating Multiple Lists
-- Reordering, Deleting, Creating Items for the List
 - List Versioning - users can rollback to old versions of their lists
-- Scalability, each modification requires minimal db access 
+- Scalability, modifications require minimal db access 
+- Multiple Lists support
+- Ability to create, delete, edit, and reorder items in the list
+
+## Tech Stack
+- PostgreSQL, Node/Express, React, TypeScript
 
 ## Development Guide
 ### Prerequisites
