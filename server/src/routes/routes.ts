@@ -12,20 +12,20 @@ function ensureAuthenticated(req: any, res: any, next: any) {
 
 router.use(ensureAuthenticated);
 
-router.get("/getLists", async (req, res) => {
+router.get("/getListEntries", async (req, res) => {
   const authenticatedUserId = (req.user as User).userId;
 
   try {
     const lists = await db.getLists(authenticatedUserId);
 
-    const listsWithEntries = await Promise.all(
+    const entries = await Promise.all(
       lists.map(async (list) => {
-        const entry = await db.getEntry(list.listId);
-        return { ...list, entry };
+        const entry = await db.getLatestEntry(list);
+        return entry;
       })
     );
 
-    res.json(listsWithEntries);
+    res.json(entries);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "An error occurred." });
@@ -56,6 +56,8 @@ router.post("/getEntryHistory", async (req, res) => {
 
 router.post("/updateList", async (req, res) => {
   const { oldEntry, newData } = req.body;
+  console.log(oldEntry);
+  console.log(newData);
   try {
     const result = await db.updateList(oldEntry, newData);
     if (result.success) {
@@ -76,11 +78,27 @@ router.post("/createNewList", async (req, res) => {
     if (result.success) {
       res.json(result);
     } else {
-      res.status(400).json(result);
+      res.status(400).json(result.error);
     }
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "An error occurred." });
+  }
+});
+
+router.post("/deleteList", async (req, res) => {
+  const { listId } = req.body; 
+
+  try {
+    const result = await db.deleteList(listId);
+    if (result.success) {
+      res.json(result);
+    } else {
+      res.status(400).json(result.error);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, error: "An error occurred." });
   }
 });
 

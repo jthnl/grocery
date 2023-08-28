@@ -12,7 +12,7 @@ function ListCard({ entry }: ListCardProps) {
   if (!groceryList || !groceryList.items || groceryList.items.length === 0) {
     return (
         <div className="list-card">
-        <h2>New List</h2>
+            <h2>{groceryList.title ? groceryList.title : "New List"}</h2>
         <div className="data">
           <ul>
            

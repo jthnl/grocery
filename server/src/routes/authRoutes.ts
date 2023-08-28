@@ -19,12 +19,10 @@ router.get('/logout', (req, res) => {
 });
 
 router.get('/profile', (req, res) => {
-  if (req.isAuthenticated()) {
+ 
     const authenticatedUserId = (req.user as User).userId;
     res.json({ userId: authenticatedUserId });
-  } else {
-    res.status(401).json({ message: 'Unauthorized.' });
-  }
+  
 });
 
 router.post('/register', async (req, res) => {

@@ -14,6 +14,14 @@ CREATE TABLE "UserAuth" (
   "passwordHash" TEXT NOT NULL
 );
 
+-- List Table
+CREATE TABLE "List" (
+  "listId" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "userId" UUID REFERENCES "User" ("userId"),
+  "latestVersion" INTEGER, -- Reference the latest version's version number
+  "active" BOOLEAN
+);
+
 -- Entry Table
 CREATE TABLE "Entry" (
   "entryId" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -21,12 +29,4 @@ CREATE TABLE "Entry" (
   "version" INTEGER,
   "data" JSON,
   "date" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- List Table
-CREATE TABLE "List" (
-  "listId" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  "userId" UUID REFERENCES "User" ("userId"),
-  "latestVersion" INTEGER, -- Reference the latest version's version number
-  "active" BOOLEAN
 );

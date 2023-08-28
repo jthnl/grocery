@@ -44,6 +44,10 @@ export async function getLists(authenticatedUserId: string): Promise<List[]> {
   return conn('List').where('userId', authenticatedUserId).andWhere('active', true);
 }
 
+export async function getLatestEntry(list: List):Promise<Entry> {
+  return conn('Entry').where('listId', list.listId).andWhere('version', list.latestVersion).first();
+}
+
 export async function getEntry(entryId: string): Promise<Entry> {
   return conn('Entry').where('entryId', entryId).first();
 }
@@ -55,7 +59,6 @@ export async function getEntryHistory(listId: string): Promise<Entry[]> {
 export async function updateList(oldEntry: Entry, newData: any): Promise<any> {
   try {
     const existingEntry: Entry = await conn('Entry').where('entryId', oldEntry.entryId).first();
-
     if (JSON.stringify(existingEntry.data) === JSON.stringify(newData)) {
       return { success: false, message: 'Data is unchanged. No updates needed.' };
     }
@@ -82,7 +85,6 @@ export async function updateList(oldEntry: Entry, newData: any): Promise<any> {
 
     return { success: true };
   } catch (error) {
-    console.log(error);
     return { success: false, error: 'An error occurred.' };
   }
 }
@@ -111,8 +113,26 @@ export async function createNewList(authenticatedUserId: string): Promise<any> {
         .where('listId', insertedList.listId)
         .update('latestVersion', 1);
 
-      return insertedList;
+      return { success: true };
     });
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: 'An error occurred.' };
+  }
+}
+
+export async function deleteList(listId: string): Promise<any> {
+  try {
+    const result = await conn.transaction(async (trx) => {
+
+      await trx('List')
+        .where('listId', listId)
+        .update('active', false);
+
+      return { success: true };
+    });
+
+    return result;
   } catch (error) {
     console.log(error);
     return { success: false, error: 'An error occurred.' };

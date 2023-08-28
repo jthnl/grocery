@@ -114,13 +114,24 @@ const Modal: React.FC<ModalProps> = ({ entry, onClose, onSave, onDelete }) => {
   };
 
   const handleSaveChanges = () => {
+    const updatedItems = [...editedItems];
+  
+    if (newItemTitle.trim() !== "") {
+      const newItem: ListItem = {
+        title: newItemTitle,
+        metadata: { checkbox: false },
+      };
+      updatedItems.push(newItem);
+    }
+  
     const updatedData: Entry = {
       ...entry,
       data: {
         title: editedTitle,
-        items: editedItems,
+        items: updatedItems,
       },
     };
+  
     onSave(updatedData);
     onClose();
   };

@@ -3,7 +3,7 @@ import { ListItem, MetaData, GroceryList } from "./models";
 
 // Define the schema for a grocery list item
 export const listItemSchema = Joi.object<ListItem>({
-  title: Joi.string().required(),
+  title: Joi.string().allow(null, ''),
   metadata: Joi.object<MetaData>({
     checkbox: Joi.boolean().required(),
   }).required(),
@@ -11,8 +11,8 @@ export const listItemSchema = Joi.object<ListItem>({
 
 // Define the schema for the entire grocery list
 export const groceryListSchema = Joi.object<GroceryList>({
-  title: Joi.string().required(),
-  items: Joi.array().items(listItemSchema).required(),
+  title: Joi.string().allow(null, ''),
+  items: Joi.array().items(listItemSchema),
 });
 
 // Validation function

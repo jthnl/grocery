@@ -1,5 +1,6 @@
 import React from 'react';
 import { authApi } from '../services/api'; // Import the new authApi
+import './SignOutButton.css';
 
 interface SignOutButtonProps {
   onSignOut: () => void;
@@ -15,8 +16,9 @@ function SignOutButton({ onSignOut }: SignOutButtonProps) {
     }
   };
   return (
-    <button onClick={handleSignOut}>Sign Out</button>
-  );
+    <button className="sign-out-button" onClick={onSignOut}>
+      Sign Out
+    </button>  );
 }
 
 export default SignOutButton;

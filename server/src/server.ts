@@ -13,7 +13,7 @@ const sessionSecret = crypto.randomBytes(32).toString('hex');
 const app = express();
 
 // cors
-app.use(cors({ origin: process.env.FRONT_END, credentials: true, }));
+app.use(cors({ origin: process.env.FRONT_END, methods: "GET,HEAD,PUT,PATCH,POST,DELETE", credentials: true, }));
 
 // middlewares
 app.use(express.json());
