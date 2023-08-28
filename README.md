@@ -1,6 +1,12 @@
 # Simple Scalable Grocery List Project
 ![website image](https://github.com/jthnl/grocery/blob/main/images/main.png)
 
+## Feature Highlights
+- Creating Multiple Lists
+- Reordering, Deleting, Creating Items for the List
+- List Versioning - users can rollback to old versions of their lists
+- Scalability, each modification requires minimal db access 
+
 ## Development Guide
 ### Prerequisites
 1. download and install npm: [Getting Started with NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
