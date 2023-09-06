@@ -42,7 +42,7 @@ export async function authenticateUser(username: string, password: string): Prom
 passport.use(
   new JwtStrategy(jwtOptions, async (payload, done) => {
     try {
-      const user = await db.getUserById(payload.sub);
+      const user = await db.getUserById(payload.userId);
       if (!user) {
         return done(null, false, { message: 'User not found.' });
       }

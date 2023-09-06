@@ -75,7 +75,7 @@ exports.authenticateUser = authenticateUser;
 // Choose passport local - JWT token strategy
 passport_1.default.use(new passport_jwt_1.Strategy(jwtOptions, (payload, done) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield db.getUserById(payload.sub);
+        const user = yield db.getUserById(payload.userId);
         if (!user) {
             return done(null, false, { message: 'User not found.' });
         }
