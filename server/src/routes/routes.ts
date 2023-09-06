@@ -2,14 +2,23 @@
 import express from "express";
 import * as db from "../database/db";
 import { User } from "../model/models";
+import passport from 'passport';
+import { Request, Response, NextFunction } from 'express';
+
 const router = express.Router();
 
 // checks that all application routes are authenticated
-function ensureAuthenticated(req: any, res: any, next: any) {
-  if (req.isAuthenticated()) {
+function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
+  passport.authenticate('jwt', { session: false }, (err: Error, user: any, info: any) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized.' });
+    }
+    req.user = user;
     return next();
-  }
-  res.status(401).json({ message: "Unauthorized." });
+  })(req, res, next);
 }
 router.use(ensureAuthenticated);
 

@@ -1,16 +1,29 @@
 // User Authentication APIs
 import express from "express";
-import passport from "passport";
 import { v4 as uuidv4 } from "uuid";
 import { User } from "../model/models";
 import { userRegistrationSchema } from "../model/joi";
 import * as db from "../database/db";
+import jwt from 'jsonwebtoken';
+import { authenticateUser } from "../middleware/passportConfig";
+
 
 const router = express.Router();
 
 // passport login user
-router.post("/login", passport.authenticate("local"), (req, res) => {
-  res.json({ message: "Logged in successfully." });
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const token = await authenticateUser(username, password);
+    if (!token) {
+      return res.status(401).json({ message: 'Authentication failed.' });
+    }
+
+    res.json({ message: 'Logged in successfully.', token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred.' });
+  }
 });
 
 // passport logout user

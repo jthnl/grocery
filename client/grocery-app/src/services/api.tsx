@@ -3,6 +3,22 @@ import { GroceryList, Entry, RegistrationData } from "../model/models";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
+// Function to set JWT token in Axios headers
+const setAuthToken = (token: string | null) => {
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete axios.defaults.headers.common['Authorization'];
+  }
+};
+
+const headers = {
+  Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+};
+
+const storedToken = localStorage.getItem('jwtToken');
+setAuthToken(storedToken);
+
 // User Authentication API Calls
 export const authApi = {
   login: async (username: string, password: string): Promise<void> => {
@@ -12,7 +28,9 @@ export const authApi = {
         password: password,
       };
 
-      await axios.post(`${BASE_URL}/login`, data, { withCredentials: true });
+      const response = await axios.post(`${BASE_URL}/login`, data);
+      const token = response.data.token;
+      localStorage.setItem('jwtToken', token);
     } catch (error) {
       console.error("Error logging in:", error);
       throw error;
@@ -21,7 +39,7 @@ export const authApi = {
 
   logout: async (): Promise<void> => {
     try {
-      await axios.get(`${BASE_URL}/logout`, { withCredentials: true });
+      await axios.get(`${BASE_URL}/logout`, { headers });
     } catch (error) {
       console.error("Error logging out:", error);
       throw error;
@@ -32,7 +50,7 @@ export const authApi = {
     try {
       const response = await axios.get<{ userId: string }>(
         `${BASE_URL}/profile`,
-        { withCredentials: true }
+        { headers }
       );
       return response.data;
     } catch (error) {
@@ -56,7 +74,7 @@ export const api = {
   getListEntries: async (): Promise<Entry[]> => {
     try {
       const response = await axios.get<Entry[]>(`${BASE_URL}/getListEntries`, {
-        withCredentials: true,
+        headers
       });
       return response.data;
     } catch (error) {
@@ -70,7 +88,7 @@ export const api = {
       const response = await axios.post<{ success: boolean }>(
         `${BASE_URL}/createNewList`,
         {},
-        { withCredentials: true }
+        { headers }
       );
       return response.data.success;
     } catch (error) {
@@ -87,7 +105,7 @@ export const api = {
       const response = await axios.post<{ success: boolean; error?: string }>(
         `${BASE_URL}/updateList`,
         { oldEntry, newData },
-        { withCredentials: true }
+        { headers }
       );
 
       if (!response.data.success) {
@@ -104,7 +122,7 @@ export const api = {
       const response = await axios.post<{ success: boolean; error?: string }>(
         `${BASE_URL}/deleteList`,
         { listId },
-        { withCredentials: true }
+        { headers }
       );
       return response.data.success;
     } catch (error) {
@@ -115,7 +133,7 @@ export const api = {
 
   signOut: async (): Promise<void> => {
     try {
-      await axios.get(`${BASE_URL}/logout`, { withCredentials: true });
+      await axios.get(`${BASE_URL}/logout`, { headers });
     } catch (error) {
       console.error("Error signing out:", error);
       throw error;
@@ -127,7 +145,7 @@ export const api = {
       const response = await axios.post<Entry[]>(
         `${BASE_URL}/getEntryHistory`,
         { listId }, 
-        { withCredentials: true }
+        { headers }
       );
       return response.data;
     } catch (error) {

@@ -35,24 +35,49 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.authenticateUser = void 0;
 const passport_1 = __importDefault(require("passport"));
-const passport_local_1 = require("passport-local");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const passport_jwt_1 = require("passport-jwt");
 const db = __importStar(require("../database/db"));
-// Choose passport local - session based strategy
-passport_1.default.use(new passport_local_1.Strategy((username, password, done) => __awaiter(void 0, void 0, void 0, function* () {
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
+const jwtOptions = {
+    jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: jwtSecret,
+};
+function authenticateUser(username, password) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const user = yield db.getUserByEmail(username);
+            if (!user) {
+                return null; // User not found
+            }
+            const userAuth = yield db.getUserAuthByUserId(user.userId);
+            if (!userAuth) {
+                return null; // User authentication data not found
+            }
+            const isPasswordValid = yield bcrypt_1.default.compare(password, userAuth.passwordHash);
+            if (!isPasswordValid) {
+                return null; // Incorrect password
+            }
+            // Generate a JWT token
+            const token = jsonwebtoken_1.default.sign({ userId: user.userId }, jwtSecret, { expiresIn: '1h' });
+            return token;
+        }
+        catch (error) {
+            console.error(error);
+            throw error;
+        }
+    });
+}
+exports.authenticateUser = authenticateUser;
+// Choose passport local - JWT token strategy
+passport_1.default.use(new passport_jwt_1.Strategy(jwtOptions, (payload, done) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield db.getUserByEmail(username);
+        const user = yield db.getUserById(payload.sub);
         if (!user) {
             return done(null, false, { message: 'User not found.' });
-        }
-        const userAuth = yield db.getUserAuthByUserId(user.userId);
-        if (!userAuth) {
-            return done(null, false, { message: 'User authentication data not found.' });
-        }
-        const result = yield bcrypt_1.default.compare(password, userAuth.passwordHash);
-        if (!result) {
-            return done(null, false, { message: 'Incorrect password.' });
         }
         return done(null, user);
     }
@@ -60,19 +85,5 @@ passport_1.default.use(new passport_local_1.Strategy((username, password, done) 
         return done(error);
     }
 })));
-// Passport - serialization from user to token
-passport_1.default.serializeUser((user, done) => {
-    done(null, user.userId);
-});
-// Passport - deserialization from token to user
-passport_1.default.deserializeUser((id, done) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const user = yield db.getUserById(id);
-        done(null, user);
-    }
-    catch (error) {
-        done(error);
-    }
-}));
 exports.default = passport_1.default;
 //# sourceMappingURL=passportConfig.js.map

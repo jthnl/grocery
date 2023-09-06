@@ -37,15 +37,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // User Authentication APIs
 const express_1 = __importDefault(require("express"));
-const passport_1 = __importDefault(require("passport"));
 const uuid_1 = require("uuid");
 const joi_1 = require("../model/joi");
 const db = __importStar(require("../database/db"));
+const passportConfig_1 = require("../middleware/passportConfig");
 const router = express_1.default.Router();
 // passport login user
-router.post("/login", passport_1.default.authenticate("local"), (req, res) => {
-    res.json({ message: "Logged in successfully." });
-});
+router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { username, password } = req.body;
+        const token = yield (0, passportConfig_1.authenticateUser)(username, password);
+        if (!token) {
+            return res.status(401).json({ message: 'Authentication failed.' });
+        }
+        res.json({ message: 'Logged in successfully.', token });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred.' });
+    }
+}));
 // passport logout user
 router.get("/logout", (req, res) => {
     req.session.destroy(() => {

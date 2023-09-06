@@ -38,13 +38,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // Dashboard Application APIs
 const express_1 = __importDefault(require("express"));
 const db = __importStar(require("../database/db"));
+const passport_1 = __importDefault(require("passport"));
 const router = express_1.default.Router();
 // checks that all application routes are authenticated
 function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
+    passport_1.default.authenticate('jwt', { session: false }, (err, user, info) => {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return res.status(401).json({ message: 'Unauthorized.' });
+        }
+        req.user = user;
         return next();
-    }
-    res.status(401).json({ message: "Unauthorized." });
+    })(req, res, next);
 }
 router.use(ensureAuthenticated);
 // get all the latest entries for lists owned by user
