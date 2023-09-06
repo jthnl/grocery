@@ -6,7 +6,7 @@ import ListCard from "./ListCard";
 import Modal from "./Modal";
 import SignOutButton from "./SignOutButton";
 import { Entry, GroceryList } from "../model/models";
-import { api } from "../services/api";
+import { api, authApi} from "../services/api";
 import "../styles/Dashboard.css";
 
 function Dashboard() {
@@ -42,7 +42,7 @@ function Dashboard() {
 
   const handleSignOut = async () => {
     try {
-      await api.signOut();
+      await authApi.logout();
       navigate("/login");
     } catch (error) {
       console.error("Error signing out:", error);

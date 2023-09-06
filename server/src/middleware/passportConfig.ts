@@ -1,23 +1,50 @@
 import passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
-import bcrypt from 'bcrypt';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import * as db from '../database/db';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-// Choose passport local - session based strategy
+
+const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
+
+const jwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: jwtSecret,
+};
+
+export async function authenticateUser(username: string, password: string): Promise<string | null> {
+  try {
+    const user = await db.getUserByEmail(username);
+    if (!user) {
+      return null; // User not found
+    }
+
+    const userAuth = await db.getUserAuthByUserId(user.userId);
+    if (!userAuth) {
+      return null; // User authentication data not found
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, userAuth.passwordHash);
+    if (!isPasswordValid) {
+      return null; // Incorrect password
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign({ userId: user.userId }, jwtSecret, { expiresIn: '1h' });
+    return token;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+// Choose passport local - JWT token strategy
 passport.use(
-  new LocalStrategy(async (username, password, done) => {
+  new JwtStrategy(jwtOptions, async (payload, done) => {
     try {
-      const user = await db.getUserByEmail(username);
+      const user = await db.getUserById(payload.userId);
       if (!user) {
         return done(null, false, { message: 'User not found.' });
-      }
-      const userAuth = await db.getUserAuthByUserId(user.userId);
-      if (!userAuth) {
-        return done(null, false, { message: 'User authentication data not found.' });
-      }
-      const result = await bcrypt.compare(password, userAuth.passwordHash);
-      if (!result) {
-        return done(null, false, { message: 'Incorrect password.' });
       }
       return done(null, user);
     } catch (error) {
@@ -25,20 +52,5 @@ passport.use(
     }
   })
 );
-
-// Passport - serialization from user to token
-passport.serializeUser((user: any, done: (err: any, id?: any) => void) => {
-  done(null, user.userId);
-});
-
-// Passport - deserialization from token to user
-passport.deserializeUser(async (id: string, done) => {
-  try {
-    const user = await db.getUserById(id);
-    done(null, user);
-  } catch (error) {
-    done(error);
-  }
-});
 
 export default passport;
