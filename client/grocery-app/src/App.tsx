@@ -33,7 +33,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   user,
   component: Component,
 }) => {
-  if (!localStorage.getItem('jwtToken');) {
+  if (!localStorage.getItem('jwtToken')) {
     return <Navigate to="/login" />;
   }
   return <Component />;
