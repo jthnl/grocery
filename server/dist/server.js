@@ -15,7 +15,7 @@ dotenv_1.default.config();
 const sessionSecret = crypto_1.default.randomBytes(32).toString('hex');
 const app = (0, express_1.default)();
 // cors
-app.use((0, cors_1.default)({ credentials: true, }));
+app.use((0, cors_1.default)({ origin: process.env.FRONT_END, methods: "GET,HEAD,PUT,PATCH,POST,DELETE", credentials: true, }));
 // middlewares
 app.use(express_1.default.json());
 app.use((0, express_session_1.default)({ secret: sessionSecret, resave: false, saveUninitialized: false }));
