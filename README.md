@@ -1,6 +1,15 @@
 # Simple Scalable Grocery List Project
 ![website image](https://github.com/jthnl/grocery/blob/main/images/main.png)
 
+## Feature Highlights
+- List Versioning - users can rollback to old versions of their lists
+- Scalability - require minimal load on database and backend (can even be further optimized, sharding, minimizing access, etc) 
+- Multiple List support
+- Ability to create, delete, edit, and reorder items in the list
+
+## Tech Stack
+- PostgreSQL, Node/Express, React, TypeScript
+
 ## Development Guide
 ### Prerequisites
 1. download and install npm: [Getting Started with NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
@@ -49,10 +58,8 @@ REACT_APP_BASE_URL=http://localhost:3001
 ![website login](https://github.com/jthnl/grocery/blob/main/images/reorder_items.png)
 1. arrows show old versions of the list:
 ![website login](https://github.com/jthnl/grocery/blob/main/images/add_items.png)
-1. delete items off the list (x):
-![website login](https://github.com/jthnl/grocery/blob/main/images/add_items.png)
-1. check items on the list (arrows) or delete items off the list (x):
-![website login](https://github.com/jthnl/grocery/blob/main/images/main.png)
+1. delete items off the list (x), check items on the list (checkbox) or create new lists:
+![website login](https://github.com/jthnl/grocery/blob/main/images/final.png)
 
 
 
