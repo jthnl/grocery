@@ -133,6 +133,7 @@ export const api = {
 
   signOut: async (): Promise<void> => {
     try {
+      localStorage.removeItem('jwtToken');
       await axios.get(`${BASE_URL}/logout`, { headers });
     } catch (error) {
       console.error("Error signing out:", error);
