@@ -10,7 +10,7 @@ dotenv.config();
 export const conn = knex({
   client: 'pg',
   connection: {
-    connectionString: process.env.POSTGRES_URL + "?sslmode=require",
+    connectionString: process.env.DB_URL,
     host: process.env.POSTGRES_HOST,
     user: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
