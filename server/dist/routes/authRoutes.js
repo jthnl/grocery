@@ -79,7 +79,7 @@ router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({ error: "An error occurred." });
+        res.status(500).json({ error: error });
     }
 }));
 exports.default = router;

@@ -23,10 +23,11 @@ dotenv_1.default.config();
 exports.conn = (0, knex_1.default)({
     client: 'pg',
     connection: {
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
+        connectionString: process.env.DB_URL,
+        host: process.env.POSTGRES_HOST,
+        user: process.env.POSTGRES_USER,
+        password: process.env.POSTGRES_PASSWORD,
+        database: process.env.POSTGRES_DATABASE
     },
 });
 // User Authentication DB Calls
