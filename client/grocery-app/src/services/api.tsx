@@ -12,10 +12,7 @@ const setAuthToken = (token: string | null) => {
   }
 };
 
-const headers = {
-  Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
-};
-
+// Initial token setup (on app startup)
 const storedToken = localStorage.getItem('jwtToken');
 setAuthToken(storedToken);
 
@@ -31,6 +28,7 @@ export const authApi = {
       const response = await axios.post(`${BASE_URL}/login`, data);
       const token = response.data.token;
       localStorage.setItem('jwtToken', token);
+      setAuthToken(token); 
     } catch (error) {
       console.error("Error logging in:", error);
       throw error;
@@ -39,7 +37,9 @@ export const authApi = {
 
   logout: async (): Promise<void> => {
     try {
-      await axios.get(`${BASE_URL}/logout`, { headers });
+      await axios.get(`${BASE_URL}/logout`);
+      localStorage.removeItem('jwtToken'); 
+      setAuthToken(null); 
     } catch (error) {
       console.error("Error logging out:", error);
       throw error;
@@ -49,8 +49,7 @@ export const authApi = {
   getProfile: async (): Promise<{ userId: string }> => {
     try {
       const response = await axios.get<{ userId: string }>(
-        `${BASE_URL}/profile`,
-        { headers }
+        `${BASE_URL}/profile`
       );
       return response.data;
     } catch (error) {
@@ -73,9 +72,7 @@ export const authApi = {
 export const api = {
   getListEntries: async (): Promise<Entry[]> => {
     try {
-      const response = await axios.get<Entry[]>(`${BASE_URL}/getListEntries`, {
-        headers
-      });
+      const response = await axios.get<Entry[]>(`${BASE_URL}/getListEntries`);
       return response.data;
     } catch (error) {
       console.error("Error fetching list entries:", error);
@@ -87,8 +84,7 @@ export const api = {
     try {
       const response = await axios.post<{ success: boolean }>(
         `${BASE_URL}/createNewList`,
-        {},
-        { headers }
+        {}
       );
       return response.data.success;
     } catch (error) {
@@ -104,8 +100,7 @@ export const api = {
     try {
       const response = await axios.post<{ success: boolean; error?: string }>(
         `${BASE_URL}/updateList`,
-        { oldEntry, newData },
-        { headers }
+        { oldEntry, newData }
       );
 
       if (!response.data.success) {
@@ -121,8 +116,7 @@ export const api = {
     try {
       const response = await axios.post<{ success: boolean; error?: string }>(
         `${BASE_URL}/deleteList`,
-        { listId },
-        { headers }
+        { listId }
       );
       return response.data.success;
     } catch (error) {
@@ -131,22 +125,11 @@ export const api = {
     }
   },
 
-  signOut: async (): Promise<void> => {
-    try {
-      localStorage.removeItem('jwtToken');
-      await axios.get(`${BASE_URL}/logout`, { headers });
-    } catch (error) {
-      console.error("Error signing out:", error);
-      throw error;
-    }
-  },
-
   getEntryHistory: async (listId: string): Promise<Entry[]> => {
     try {
       const response = await axios.post<Entry[]>(
         `${BASE_URL}/getEntryHistory`,
-        { listId }, 
-        { headers }
+        { listId }
       );
       return response.data;
     } catch (error) {
