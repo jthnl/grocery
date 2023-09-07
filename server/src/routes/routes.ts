@@ -7,6 +7,13 @@ import { Request, Response, NextFunction } from 'express';
 
 const router = express.Router();
 
+// get user profile
+router.get("/profile", (req, res) => {
+  console.log("profile:", req.user);
+  const authenticatedUserId = (req.user as User).userId;
+  res.json({ userId: authenticatedUserId });
+});
+
 // checks that all application routes are authenticated
 function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
   passport.authenticate('jwt', { session: false }, (err: Error, user: any, info: any) => {

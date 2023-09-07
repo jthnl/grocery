@@ -46,6 +46,7 @@ const router = express_1.default.Router();
 router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, password } = req.body;
+        console.log("login:", username, "-", password);
         const token = yield (0, passportConfig_1.authenticateUser)(username, password);
         if (!token) {
             return res.status(401).json({ message: 'Authentication failed.' });
@@ -62,11 +63,6 @@ router.get("/logout", (req, res) => {
     req.session.destroy(() => {
         res.json({ message: "Logged out successfully." });
     });
-});
-// get user profile
-router.get("/profile", (req, res) => {
-    const authenticatedUserId = req.user.userId;
-    res.json({ userId: authenticatedUserId });
 });
 // register a new user
 router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {

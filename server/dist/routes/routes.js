@@ -40,6 +40,12 @@ const express_1 = __importDefault(require("express"));
 const db = __importStar(require("../database/db"));
 const passport_1 = __importDefault(require("passport"));
 const router = express_1.default.Router();
+// get user profile
+router.get("/profile", (req, res) => {
+    console.log("profile:", req.user);
+    const authenticatedUserId = req.user.userId;
+    res.json({ userId: authenticatedUserId });
+});
 // checks that all application routes are authenticated
 function ensureAuthenticated(req, res, next) {
     passport_1.default.authenticate('jwt', { session: false }, (err, user, info) => {

@@ -14,6 +14,7 @@ const router = express.Router();
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log("login:", username,"-", password);
     const token = await authenticateUser(username, password);
     if (!token) {
       return res.status(401).json({ message: 'Authentication failed.' });
@@ -31,12 +32,6 @@ router.get("/logout", (req, res) => {
   req.session.destroy(() => {
     res.json({ message: "Logged out successfully." });
   });
-});
-
-// get user profile
-router.get("/profile", (req, res) => {
-  const authenticatedUserId = (req.user as User).userId;
-  res.json({ userId: authenticatedUserId });
 });
 
 // register a new user
